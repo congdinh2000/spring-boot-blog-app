@@ -1,4 +1,4 @@
-package com.springboot.blog.service;
+package com.springboot.blog.security;
 
 import com.springboot.blog.entity.Role;
 import com.springboot.blog.entity.User;

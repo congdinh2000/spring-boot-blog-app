@@ -1,7 +1,10 @@
-package com.springboot.blog.config;
+package com.springboot.blog.security;
 
-import com.springboot.blog.service.CustomUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -11,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // inject dependency
     @Autowired
@@ -28,12 +31,21 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         // get jwt token from request
         String token = getJWTFromRequest(request);
         // validate token
+        if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            // get username from token
+            String username = jwtTokenProvider.getUsernameFromToken(token);
+            // load user associated with token
+            UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
 
-        // get username from token
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-        // load user associated with token
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        // set spring security
+            // set spring security
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }
+
+        filterChain.doFilter(request, response);
     }
 
     // Bear <accessToken>
