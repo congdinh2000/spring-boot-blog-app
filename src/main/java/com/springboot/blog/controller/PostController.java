@@ -48,6 +48,7 @@ public class PostController {
     }
 
     // update post by id
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto,@PathVariable(name="id") Long id){
         PostDto res = iPostService.updatePost(postDto, id);
@@ -55,6 +56,7 @@ public class PostController {
     }
 
     // delete post by id
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id){
         iPostService.deletePostById(id);
