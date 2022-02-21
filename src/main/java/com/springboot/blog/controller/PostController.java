@@ -3,6 +3,8 @@ package com.springboot.blog.controller;
 import com.springboot.blog.interfaces.IPostService;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+@Api(value = "CRUD REST APIs cho bài viết")
 @RestController
 @RequestMapping("/api/v1/posts")
 public class PostController {
@@ -24,6 +27,7 @@ public class PostController {
     }
 
     // get all posts / api
+    @ApiOperation(value = "REST API lấy tất cả bài viết trên blog")
     @GetMapping
     public PostResponse getAllPost(
             @RequestParam(value = "pageIndex", defaultValue = "0", required = false) int pageIndex,
@@ -34,6 +38,7 @@ public class PostController {
         return iPostService.getAllPost(pageIndex, pageSize, sortBy, sortDir);
     }
 
+    @ApiOperation(value = "REST API tạo bài viết mới")
     @PreAuthorize("hasRole('ADMIN')")
     // create post blog
     @PostMapping
@@ -42,12 +47,14 @@ public class PostController {
     }
 
     // get post by id
+    @ApiOperation(value = "REST API lấy bài viết trên blog theo id")
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(iPostService.getPostById(id));
     }
 
     // update post by id
+    @ApiOperation(value = "REST API cập nhật bài viết trên blog theo id")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto,@PathVariable(name="id") Long id){
@@ -56,6 +63,7 @@ public class PostController {
     }
 
     // delete post by id
+    @ApiOperation(value = "REST API xóa bài viết trên blog theo id")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id){
